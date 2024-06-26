@@ -3,7 +3,10 @@ package app.lawnchair.lawnicons.ui.destination
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.lawnchair.lawnicons.BuildConfig
@@ -29,6 +33,7 @@ import app.lawnchair.lawnicons.ui.components.core.Card
 import app.lawnchair.lawnicons.ui.components.core.LawniconsScaffold
 import app.lawnchair.lawnicons.ui.components.core.SimpleListRow
 import app.lawnchair.lawnicons.ui.theme.LawniconsTheme
+import app.lawnchair.lawnicons.ui.util.Constants
 import app.lawnchair.lawnicons.ui.util.Contributor
 import app.lawnchair.lawnicons.ui.util.Destinations
 import app.lawnchair.lawnicons.ui.util.ExternalLink
@@ -39,12 +44,12 @@ private val externalLinks = listOf(
     ExternalLink(
         iconResId = R.drawable.github_foreground,
         name = R.string.github,
-        url = "https://github.com/LawnchairLauncher/lawnicons",
+        url = "${Constants.GITHUB}",
     ),
     ExternalLink(
-        iconResId = R.drawable.oxygen_updater_foreground,
+        iconResId = R.drawable.icon_request_app,
         name = R.string.request_form,
-        url = "https://forms.gle/xt7sJhgWEasuo9TR9",
+        url = Constants.ICON_REQUEST_FORM,
     ),
 )
 
@@ -73,15 +78,30 @@ private val specialThanks = listOf(
 )
 
 @Composable
-fun About(onBack: () -> Unit, onNavigate: (String) -> Unit, isExpandedScreen: Boolean) {
+fun About(
+    onBack: () -> Unit,
+    onNavigate: (String) -> Unit,
+    isExpandedScreen: Boolean,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
 
     LawniconsScaffold(
+        modifier = modifier,
         title = stringResource(id = R.string.about),
         onBack = onBack,
         isExpandedScreen = isExpandedScreen,
     ) { paddingValues ->
-        LazyColumn(modifier = Modifier.padding(paddingValues)) {
+        val layoutDirection = LocalLayoutDirection.current
+        val verticalListPadding = 8.dp
+        LazyColumn(
+            contentPadding = PaddingValues(
+                start = paddingValues.calculateStartPadding(layoutDirection),
+                top = paddingValues.calculateTopPadding() + verticalListPadding,
+                end = paddingValues.calculateEndPadding(layoutDirection),
+                bottom = paddingValues.calculateBottomPadding() + verticalListPadding,
+            ),
+        ) {
             item {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -166,6 +186,15 @@ fun About(onBack: () -> Unit, onNavigate: (String) -> Unit, isExpandedScreen: Bo
                             socialUrl = it.socialUrl,
                         )
                     }
+                }
+            }
+            item {
+                Card(modifier = Modifier.padding(top = 16.dp)) {
+                    SimpleListRow(
+                        onClick = { onNavigate(Destinations.ACKNOWLEDGEMENTS) },
+                        label = stringResource(id = R.string.acknowledgements),
+                        divider = false,
+                    )
                 }
             }
         }

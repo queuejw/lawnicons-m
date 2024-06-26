@@ -12,15 +12,13 @@
     <!-- We don't currently provide a singular form, because it's always guaranteed that there will be atleast 2 or more icons. -->
     <string name="search_bar_hint">Search through %d icons</string>
 
-    <!-- Text shown when there are no search results-->
-    <string name="no_items_found">No icons found</string>
+    <string name="search_bar_icon_picker">Pick an icon</string>
 
-    <!-- Popup menu in search bar -->
-    <!-- Popup menu item that links to the Acknowledgements page -->
-    <string name="acknowledgements">Acknowledgements</string>
-    <!-- Popup menu item that links to the About page -->
+    <!-- Text shown when there are no search results-->
+    <string name="no_items_found">%s not found</string>
 
     <!-- About page -->
+    <string name="about">About</string>
 
     <!-- External Links -->
     <!-- GitHub repository link-->
@@ -47,11 +45,32 @@
     <!-- Subtitle displayed below the user who named the app -->
     <string name="special_thanks_name">For naming the app</string>
 
+    <!-- List item that links to the Acknowledgements page -->
+    <string name="acknowledgements">Acknowledgements</string>
+
     <!-- Icon Information Popup window -->
 
+    <!-- Name -->
+    <string name="name">Name</string>
     <!-- Drawable prefix -->
     <string name="drawable">Drawable</string>
     <!-- Package prefix -->
-    <string name="package_prefix">Package</string>
-    <string name="about">About</string>
+    <string name="component">Component name</string>
+
+    <!-- Mapped components -->
+    <string name="mapped_components">Mapped components</string>
+    <!-- Outdated icon info -->
+    <string name="icon_info_outdated_warning">If the icon is outdated due to rebranding, create an issue on GitHub.</string>
+
+    <!-- Chevron a11y description -->
+    <string name="toggle_visibility_of_contents">Toggle visibility of contents</string>
+
+    <!-- Request icons button -->
+    <string name="request_icons">Request icons</string>
+
+    <string name="copy_to_clipboard">Copy to clipboard</string>
+    <string name="copied_text">Copied text</string>
+
+    <string name="snackbar_request_too_large">Copied icon request details to clipboard. To request them, submit the details into the form.</string>
+    <string name="snackbar_use_fallback_link">Open form</string>
 </resources>

@@ -3,22 +3,23 @@ package app.lawnchair.lawnicons.ui.destination
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.lawnchair.lawnicons.R
 import app.lawnchair.lawnicons.model.GitHubContributor
 import app.lawnchair.lawnicons.ui.components.ContributorRow
@@ -26,26 +27,28 @@ import app.lawnchair.lawnicons.ui.components.ContributorRowPlaceholder
 import app.lawnchair.lawnicons.ui.components.ExternalLinkRow
 import app.lawnchair.lawnicons.ui.components.core.LawniconsScaffold
 import app.lawnchair.lawnicons.ui.theme.LawniconsTheme
+import app.lawnchair.lawnicons.ui.util.Constants
 import app.lawnchair.lawnicons.ui.util.PreviewLawnicons
-import app.lawnchair.lawnicons.ui.util.toPaddingValues
 import app.lawnchair.lawnicons.viewmodel.ContributorsUiState
 import app.lawnchair.lawnicons.viewmodel.ContributorsViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
-const val CONTRIBUTOR_URL = "https://github.com/LawnchairLauncher/lawnicons/graphs/contributors"
+const val CONTRIBUTOR_URL = "${Constants.GITHUB}/graphs/contributors"
 
 @Composable
 fun Contributors(
     onBack: () -> Unit,
     isExpandedScreen: Boolean,
+    modifier: Modifier = Modifier,
     contributorsViewModel: ContributorsViewModel = hiltViewModel(),
 ) {
-    val uiState by contributorsViewModel.uiState.collectAsState()
+    val uiState by contributorsViewModel.uiState.collectAsStateWithLifecycle()
     Contributors(
         uiState = uiState,
         onBack = onBack,
         isExpandedScreen = isExpandedScreen,
+        modifier = modifier,
     )
 }
 
@@ -54,20 +57,36 @@ fun Contributors(
     uiState: ContributorsUiState,
     onBack: () -> Unit,
     isExpandedScreen: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     LawniconsScaffold(
+        modifier = modifier,
         title = stringResource(id = R.string.contributors),
         onBack = onBack,
         isExpandedScreen = isExpandedScreen,
     ) { paddingValues ->
+        val layoutDirection = LocalLayoutDirection.current
+        val verticalListPadding = 8.dp
+        val innerPaddingValues = PaddingValues(
+            start = paddingValues.calculateStartPadding(layoutDirection),
+            top = paddingValues.calculateTopPadding() + verticalListPadding,
+            end = paddingValues.calculateEndPadding(layoutDirection),
+            bottom = paddingValues.calculateBottomPadding() + verticalListPadding,
+        )
         Crossfade(
             targetState = uiState,
-            modifier = Modifier.padding(paddingValues = paddingValues),
             label = "",
         ) {
             when (it) {
-                is ContributorsUiState.Success -> ContributorList(contributors = it.contributors)
-                is ContributorsUiState.Loading -> ContributorListPlaceholder()
+                is ContributorsUiState.Success -> ContributorList(
+                    contributors = it.contributors,
+                    contentPadding = innerPaddingValues,
+                )
+
+                is ContributorsUiState.Loading -> ContributorListPlaceholder(
+                    contentPadding = innerPaddingValues,
+                )
+
                 is ContributorsUiState.Error -> ContributorListError(onBack = onBack)
             }
         }
@@ -75,12 +94,14 @@ fun Contributors(
 }
 
 @Composable
-fun ContributorList(contributors: ImmutableList<GitHubContributor>) {
+private fun ContributorList(
+    contributors: ImmutableList<GitHubContributor>,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     LazyColumn(
-        contentPadding = WindowInsets.navigationBars.toPaddingValues(
-            additionalTop = 8.dp,
-            additionalBottom = 8.dp,
-        ),
+        modifier = modifier,
+        contentPadding = contentPadding,
     ) {
         item {
             ExternalLinkRow(
@@ -110,13 +131,14 @@ fun ContributorList(contributors: ImmutableList<GitHubContributor>) {
 }
 
 @Composable
-fun ContributorListPlaceholder() {
+private fun ContributorListPlaceholder(
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     val itemCount = 20
     LazyColumn(
-        contentPadding = WindowInsets.navigationBars.toPaddingValues(
-            additionalTop = 8.dp,
-            additionalBottom = 8.dp,
-        ),
+        modifier = modifier,
+        contentPadding = contentPadding,
     ) {
         items(itemCount) {
             ContributorRowPlaceholder(
@@ -129,7 +151,7 @@ fun ContributorListPlaceholder() {
 }
 
 @Composable
-fun ContributorListError(
+private fun ContributorListError(
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current

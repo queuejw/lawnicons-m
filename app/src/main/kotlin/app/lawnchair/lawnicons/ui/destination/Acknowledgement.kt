@@ -14,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +27,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.lawnchair.lawnicons.ui.components.core.LawniconsScaffold
 import app.lawnchair.lawnicons.ui.components.core.placeholder.PlaceholderHighlight
 import app.lawnchair.lawnicons.ui.components.core.placeholder.fade
@@ -39,6 +39,7 @@ fun Acknowledgement(
     name: String?,
     onBack: () -> Unit,
     isExpandedScreen: Boolean,
+    modifier: Modifier = Modifier,
     acknowledgementViewModel: AcknowledgementViewModel = hiltViewModel(),
 ) {
     requireNotNull(name)
@@ -49,9 +50,10 @@ fun Acknowledgement(
             color = MaterialTheme.colorScheme.primary,
             textDecoration = TextDecoration.Underline,
         ),
-    ).collectAsState()
+    ).collectAsStateWithLifecycle()
 
     LawniconsScaffold(
+        modifier = modifier,
         title = name,
         onBack = onBack,
         isExpandedScreen = isExpandedScreen,

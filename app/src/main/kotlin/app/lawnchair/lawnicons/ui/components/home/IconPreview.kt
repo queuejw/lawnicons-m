@@ -1,5 +1,6 @@
 package app.lawnchair.lawnicons.ui.components.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,7 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,26 +42,35 @@ private fun ColorScheme.iconColor(): Color {
 @Composable
 fun IconPreview(
     iconInfo: IconInfo,
+    onSendResult: (IconInfo) -> Unit,
+    modifier: Modifier = Modifier,
     iconBackground: Color? = null,
+    isIconPicker: Boolean = false,
 ) {
-    val isIconInfoShown = remember { mutableStateOf(false) }
-
-    val modifier = Modifier
-        .padding(all = 8.dp)
-        .aspectRatio(ratio = 1F)
-        .clip(shape = CircleShape)
-        .clickable(onClick = { isIconInfoShown.value = true })
-        .background(
-            color = iconBackground ?: if (isIconInfoShown.value) {
-                MaterialTheme.colorScheme.surfaceVariant
-            } else {
-                MaterialTheme.colorScheme.iconColor()
-            },
-        )
+    val isIconInfoShown = rememberSaveable { mutableStateOf(false) }
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier,
+        modifier = modifier
+            .padding(all = 8.dp)
+            .aspectRatio(ratio = 1F)
+            .clip(shape = CircleShape)
+            .clickable(
+                onClick = {
+                    if (isIconPicker) {
+                        onSendResult(iconInfo)
+                    } else {
+                        isIconInfoShown.value = true
+                    }
+                },
+            )
+            .background(
+                color = iconBackground ?: if (isIconInfoShown.value) {
+                    MaterialTheme.colorScheme.surfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.iconColor()
+                },
+            ),
     ) {
         if (LocalInspectionMode.current) {
             val icon = when (iconInfo.id) {
@@ -92,8 +102,8 @@ fun IconPreview(
             )
         }
     }
-    if (isIconInfoShown.value) {
-        IconInfoPopup(
+    AnimatedVisibility(isIconInfoShown.value) {
+        IconInfoSheet(
             iconInfo = iconInfo,
         ) {
             isIconInfoShown.value = it
@@ -107,6 +117,7 @@ private fun IconPreviewComposablePreview() {
     LawniconsTheme {
         IconPreview(
             iconInfo = SampleData.iconInfoSample,
+            {},
         )
     }
 }
