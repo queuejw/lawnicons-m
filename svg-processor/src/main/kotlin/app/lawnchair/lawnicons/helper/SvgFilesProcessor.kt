@@ -97,7 +97,7 @@ object SvgFilesProcessor {
             } catch (e: DocumentException) {
                 throw RuntimeException(e)
             }
-            //createAdaptive(targetFile, bg)
+            createAdaptive(targetFile, bg)
         } else {
             println("Skipping file as its not svg " + svgSource.fileName)
         }
